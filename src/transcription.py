@@ -68,9 +68,18 @@ def transcribe_api(audio_data):
     Transcribe an audio file using the OpenAI API.
     """
     model_options = ConfigManager.get_config_section('model_options')
+    api_key = os.getenv('OPENAI_API_KEY')
+    base_url_config = model_options['api'].get('base_url')
+
+    # Ensure base_url is a valid string or None
+    if isinstance(base_url_config, str) and base_url_config.strip():
+        base_url = base_url_config.strip()
+    else:
+        base_url = 'https://api.openai.com/v1' # Default if not provided or invalid
+
     client = OpenAI(
-        api_key=os.getenv('OPENAI_API_KEY') or None,
-        base_url=model_options['api']['base_url'] or 'https://api.openai.com/v1'
+        api_key=api_key,
+        base_url=base_url
     )
 
     # Convert numpy array to WAV file
